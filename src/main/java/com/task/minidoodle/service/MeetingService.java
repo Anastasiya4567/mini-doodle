@@ -3,6 +3,7 @@ package com.task.minidoodle.service;
 import com.task.minidoodle.domain.Meeting;
 import com.task.minidoodle.domain.SlotStatus;
 import com.task.minidoodle.dto.CreateMeetingRequest;
+import com.task.minidoodle.exception.SlotNotAvailableException;
 import com.task.minidoodle.repository.MeetingRepository;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
@@ -22,7 +23,7 @@ public class MeetingService {
         var slot = slotRepository.findById(request.getSlotId()).orElseThrow();
 
         if (SlotStatus.FREE != slot.getStatus()) {
-            throw new RuntimeException("Slot not available");
+            throw new SlotNotAvailableException("Selected slot is not available");
         }
 
         var participants = userRepository.findAllById(request.getParticipantIds());

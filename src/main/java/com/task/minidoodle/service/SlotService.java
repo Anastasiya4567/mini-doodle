@@ -4,6 +4,7 @@ import com.task.minidoodle.domain.SlotStatus;
 import com.task.minidoodle.domain.TimeSlot;
 import com.task.minidoodle.domain.User;
 import com.task.minidoodle.dto.CreateSlotRequest;
+import com.task.minidoodle.exception.SlotOverlapException;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class SlotService {
         var overlaps = slotRepository.findOverlappingSlots(userId, request.getStartTime(), request.getEndTime());
 
         if (!overlaps.isEmpty()) {
-            throw new RuntimeException("Overlapping slot");
+            throw new SlotOverlapException("User already has a slot during this period");
         }
 
         var slot = buildFreeTimeSlot(request, user);

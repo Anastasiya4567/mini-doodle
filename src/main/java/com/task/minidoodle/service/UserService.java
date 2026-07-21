@@ -1,6 +1,7 @@
 package com.task.minidoodle.service;
 
 import com.task.minidoodle.domain.User;
+import com.task.minidoodle.exception.NotFoundException;
 import com.task.minidoodle.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class UserService {
 
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found: " + id));
     }
 
     public List<User> getAll() {
