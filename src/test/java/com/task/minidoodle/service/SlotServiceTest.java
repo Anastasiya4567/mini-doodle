@@ -8,6 +8,8 @@ import com.task.minidoodle.exception.InvalidTimeRangeException;
 import com.task.minidoodle.exception.SlotOverlapException;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +36,12 @@ class SlotServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MeterRegistry meterRegistry;
+
+    @Mock
+    private Counter counter;
+
     @InjectMocks
     private SlotService slotService;
 
@@ -50,10 +58,11 @@ class SlotServiceTest {
         request.setStartTime(startTime);
         request.setEndTime(startTime.plusHours(1));
 
-        when(userRepository.findById(userId))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         when(slotRepository.findOverlappingSlots(anyLong(), any(), any())).thenReturn(List.of());
+
+        when(meterRegistry.counter("slots.created")).thenReturn(counter);
 
         // when
         slotService.create(userId, request);

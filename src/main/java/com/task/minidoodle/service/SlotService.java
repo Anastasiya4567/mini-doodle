@@ -9,6 +9,7 @@ import com.task.minidoodle.exception.NotFoundException;
 import com.task.minidoodle.exception.SlotOverlapException;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class SlotService {
 
     private final TimeSlotRepository slotRepository;
     private final UserRepository userRepository;
+    private final MeterRegistry meterRegistry;
 
     @Transactional
     public TimeSlot create(Long userId, CreateSlotRequest request) {
@@ -36,7 +38,9 @@ public class SlotService {
 
         if (overlaps.isEmpty()) {
             var slot = buildFreeTimeSlot(request, user);
-            return slotRepository.save(slot);
+            var savedSlot = slotRepository.save(slot);
+            meterRegistry.counter("slots.created").increment();
+            return savedSlot;
         }
         throw new SlotOverlapException("User already has a slot during this period");
     }

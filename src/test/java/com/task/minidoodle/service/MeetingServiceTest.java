@@ -9,6 +9,8 @@ import com.task.minidoodle.exception.SlotNotAvailableException;
 import com.task.minidoodle.repository.MeetingRepository;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +39,12 @@ class MeetingServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MeterRegistry meterRegistry;
+
+    @Mock
+    private Counter counter;
+
     @InjectMocks
     private MeetingService meetingService;
 
@@ -60,8 +68,9 @@ class MeetingServiceTest {
 
         when(userRepository.findAllById(any())).thenReturn(List.of());
 
-        when(meetingRepository.save(any(Meeting.class)))
-                .thenAnswer(i -> i.getArgument(0));
+        when(meetingRepository.save(any(Meeting.class))).thenAnswer(i -> i.getArgument(0));
+
+        when(meterRegistry.counter("meetings.created")).thenReturn(counter);
 
         // when
         var meeting = meetingService.create(request);

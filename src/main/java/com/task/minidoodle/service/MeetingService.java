@@ -10,6 +10,8 @@ import com.task.minidoodle.exception.SlotNotAvailableException;
 import com.task.minidoodle.repository.MeetingRepository;
 import com.task.minidoodle.repository.TimeSlotRepository;
 import com.task.minidoodle.repository.UserRepository;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +26,11 @@ public class MeetingService {
     private final TimeSlotRepository slotRepository;
     private final MeetingRepository meetingRepository;
     private final UserRepository userRepository;
+    private final MeterRegistry meterRegistry;
 
+    @Timed(value = "meeting.creation.time", description = "Time spent creating meetings")
     @Transactional
     public Meeting create(CreateMeetingRequest request) {
-
         var slot = slotRepository.findById(request.getSlotId())
                 .orElseThrow(() -> new NotFoundException("Slot not found: " + request.getSlotId()));
 
@@ -38,7 +41,9 @@ public class MeetingService {
         var participants = userRepository.findAllById(request.getParticipantIds());
         var meeting = buildMeeting(request, slot, participants);
         slot.setStatus(SlotStatus.BOOKED);
-        return meetingRepository.save(meeting);
+        var savedMeeting = meetingRepository.save(meeting);
+        meterRegistry.counter("meetings.created").increment();
+        return savedMeeting;
     }
 
     public Meeting getById(Long id) {
