@@ -4,10 +4,9 @@ import com.task.minidoodle.domain.Meeting;
 import com.task.minidoodle.dto.CreateMeetingRequest;
 import com.task.minidoodle.service.MeetingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/meetings")
@@ -20,4 +19,20 @@ public class MeetingController {
     public Meeting create(@RequestBody CreateMeetingRequest request) {
         return meetingService.create(request);
     }
+
+    @GetMapping
+    public List<Meeting> getAll() {
+        return meetingService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Meeting getById(@PathVariable Long id) {
+        return meetingService.getById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void cancel(@PathVariable Long id) {
+        meetingService.cancel(id);
+    }
+
 }

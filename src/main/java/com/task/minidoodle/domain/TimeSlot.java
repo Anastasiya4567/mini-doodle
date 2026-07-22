@@ -26,4 +26,8 @@ public class TimeSlot {
 
     @ManyToOne
     private User user;
+
+    @OneToOne(mappedBy = "slot")
+    private Meeting meeting;
+
 }

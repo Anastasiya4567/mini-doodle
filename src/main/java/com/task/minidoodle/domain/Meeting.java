@@ -28,4 +28,9 @@ public class Meeting {
 
     @ManyToMany
     private List<User> participants;
+
+    @OneToOne
+    @JoinColumn(name = "slot_id")
+    private TimeSlot slot;
+
 }
