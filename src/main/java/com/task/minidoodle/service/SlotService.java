@@ -75,7 +75,7 @@ public class SlotService {
     }
 
     private void validateTimeRange(LocalDateTime start, LocalDateTime end) {
-        if (end.isAfter(start)) {
+        if (!start.isBefore(end)) {
             throw new InvalidTimeRangeException("Start time must be before end time");
         }
     }

@@ -49,8 +49,7 @@ class MeetingControllerTest {
                 .endTime(LocalDateTime.now().plusHours(1))
                 .build();
 
-        when(meetingService.create(any(CreateMeetingRequest.class)))
-                .thenReturn(meeting);
+        when(meetingService.create(any(CreateMeetingRequest.class))).thenReturn(meeting);
 
         // when / then
         mockMvc.perform(post("/meetings")
